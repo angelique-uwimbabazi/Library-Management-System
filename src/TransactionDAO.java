@@ -1,3 +1,4 @@
+// TransactionDAO.java
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,79 +10,37 @@ public class TransactionDAO {
         this.connection = connection;
     }
 
-    // Add a new transaction
     public void addTransaction(Transaction transaction) throws SQLException {
-        String sql = "INSERT INTO transactions (bookId, patronId, transactionType, transactionDate) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, transaction.getBookId());
-            stmt.setInt(2, transaction.getPatronId());
-            stmt.setString(3, transaction.getTransactionType());
-            stmt.setDate(4, transaction.getTransactionDate());
-            stmt.executeUpdate();
-
-            ResultSet generatedKeys = stmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                transaction.setTransactionId(generatedKeys.getInt(1));
-            }
+        String sql = "INSERT INTO transactions (patron_id, book_id, borrow_date) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, transaction.getPatronId());
+            statement.setInt(2, transaction.getBookId());
+            statement.setDate(3, transaction.getBorrowDate());
+            statement.executeUpdate();
         }
     }
 
-    // Update an existing transaction
-    public void updateTransaction(Transaction transaction) throws SQLException {
-        String sql = "UPDATE transactions SET bookId = ?, patronId = ?, transactionType = ?, transactionDate = ? WHERE transactionId = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, transaction.getBookId());
-            stmt.setInt(2, transaction.getPatronId());
-            stmt.setString(3, transaction.getTransactionType());
-            stmt.setDate(4, transaction.getTransactionDate());
-            stmt.setInt(5, transaction.getTransactionId());
-            stmt.executeUpdate();
+    public void returnBook(int transactionId, Date returnDate) throws SQLException {
+        String sql = "UPDATE transactions SET return_date = ? WHERE transaction_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, returnDate);
+            statement.setInt(2, transactionId);
+            statement.executeUpdate();
         }
     }
 
-    // Delete a transaction by ID
-    public void deleteTransaction(int transactionId) throws SQLException {
-        String sql = "DELETE FROM transactions WHERE transactionId = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, transactionId);
-            stmt.executeUpdate();
-        }
-    }
-
-    // Get a transaction by ID
-    public Transaction getTransactionById(int transactionId) throws SQLException {
-        String sql = "SELECT * FROM transactions WHERE transactionId = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, transactionId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Transaction(
-                        rs.getInt("transactionId"),
-                        rs.getInt("bookId"),
-                        rs.getInt("patronId"),
-                        rs.getString("transactionType"),
-                        rs.getDate("transactionDate")
-                );
-            }
-        }
-        return null;
-    }
-
-    // Get all transactions
     public List<Transaction> getAllTransactions() throws SQLException {
-        List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT * FROM transactions";
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                Transaction transaction = new Transaction(
-                        rs.getInt("transactionId"),
-                        rs.getInt("bookId"),
-                        rs.getInt("patronId"),
-                        rs.getString("transactionType"),
-                        rs.getDate("transactionDate")
-                );
-                transactions.add(transaction);
+        List<Transaction> transactions = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                int transactionId = resultSet.getInt("transaction_id");
+                int patronId = resultSet.getInt("patron_id");
+                int bookId = resultSet.getInt("book_id");
+                Date borrowDate = resultSet.getDate("borrow_date");
+                Date returnDate = resultSet.getDate("return_date");
+                transactions.add(new Transaction(transactionId, patronId, bookId, borrowDate, returnDate));
             }
         }
         return transactions;

@@ -1,34 +1,34 @@
+// Transaction.java
 import java.sql.Date;
 
 public class Transaction {
     private int transactionId;
-    private int bookId;
     private int patronId;
-    private String transactionType;
-    private Date transactionDate;
+    private int bookId;
+    private Date borrowDate;
+    private Date returnDate;
 
-    public Transaction(int transactionId, int bookId, int patronId, String transactionType, Date transactionDate) {
+    public Transaction(int transactionId, int patronId, int bookId, Date borrowDate, Date returnDate) {
         this.transactionId = transactionId;
-        this.bookId = bookId;
         this.patronId = patronId;
-        this.transactionType = String.valueOf(transactionType);
-        this.transactionDate = transactionDate;
+        this.bookId = bookId;
+        this.borrowDate = borrowDate;
+        this.returnDate = returnDate;
     }
 
+    public Transaction(int patronId, int bookId, Date borrowDate) {
+        this.patronId = patronId;
+        this.bookId = bookId;
+        this.borrowDate = borrowDate;
+    }
+
+    // Getters and Setters
     public int getTransactionId() {
         return transactionId;
     }
 
     public void setTransactionId(int transactionId) {
         this.transactionId = transactionId;
-    }
-
-    public int getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(int bookId) {
-        this.bookId = bookId;
     }
 
     public int getPatronId() {
@@ -39,19 +39,27 @@ public class Transaction {
         this.patronId = patronId;
     }
 
-    public String getTransactionType() {
-        return transactionType;
+    public int getBookId() {
+        return bookId;
     }
 
-    public void setTransactionType(String transactionType) {
-        this.transactionType = transactionType;
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
     }
 
-    public Date getTransactionDate() {
-        return transactionDate;
+    public Date getBorrowDate() {
+        return borrowDate;
     }
 
-    public void setTransactionDate(Date transactionDate) {
-        this.transactionDate = transactionDate;
+    public void setBorrowDate(Date borrowDate) {
+        this.borrowDate = borrowDate;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
 }
