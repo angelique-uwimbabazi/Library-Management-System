@@ -1,10 +1,10 @@
-// ReservationQueue.java
 import java.util.LinkedList;
 
-public class ReservationQueue {
+public class TransactionQueue {
+
     private LinkedList<Transaction> queue;
 
-    public ReservationQueue() {
+    public TransactionQueue() {
         queue = new LinkedList<>();
     }
 
@@ -13,10 +13,18 @@ public class ReservationQueue {
     }
 
     public Transaction dequeue() {
-        return queue.removeFirst();
+        return queue.poll();
+    }
+
+    public Transaction peek() {
+        return queue.peek();
     }
 
     public boolean isEmpty() {
         return queue.isEmpty();
+    }
+
+    public int size() {
+        return queue.size();
     }
 }
